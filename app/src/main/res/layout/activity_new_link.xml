@@ -1,59 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".NewLinkActivity">
-    <LinearLayout
-        android:id="@+id/login"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="#444444"
-        android:padding="25dp"
-        android:orientation="vertical">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            tools:listitem="@layout/recyclerview_item"
-            android:padding="@dimen/big_padding"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/url"
-                android:layout_width="255dp"
-                android:layout_height="wrap_content"
-                android:autofillHints=""
-                android:hint="@string/enter_url"
-                android:importantForAutofill="no"
-                android:inputType="textUri"
-                android:textAlignment="center"
-                android:textColor="#6bfff7"
-                android:textColorHint="#52afaa" />
-
-            <Button
-                android:id="@+id/btn_connect"
-                android:layout_width="101dp"
-                android:layout_height="wrap_content"
-                android:text="@string/connect"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textColor="@color/colorPrimaryDark"/>
-        </LinearLayout>
-
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
