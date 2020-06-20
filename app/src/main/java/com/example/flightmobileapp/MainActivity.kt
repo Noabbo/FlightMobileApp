@@ -8,44 +8,47 @@ import android.text.TextUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.flightmobileapp.MainActivity.Companion.EXTRA_REPLY
 
 class MainActivity : AppCompatActivity() {
     private val newLinkActivityRequestCode = 1
     private lateinit var linkViewModel: LinkViewModel
-    private lateinit var editLinkView: EditText
+    private lateinit var url: EditText
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        editLinkView = findViewById(R.id.url)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         val adapter = LinkListAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-        val button = findViewById<Button>(R.id.btn_connect)
-        button.setOnClickListener {
-            val replyIntent = Intent()
-            if (TextUtils.isEmpty(editLinkView.text)) {
-                setResult(Activity.RESULT_CANCELED, replyIntent)
+        linkViewModel = ViewModelProvider(this).get(linkViewModel::class.java)
+        linkViewModel.allLinks.observe(this, Observer { links ->
+            // Update the cached copy of the words in the adapter.
+            links?.let { adapter.setWords(it) }
+        })
+        url = findViewById<EditText>(R.id.url)
+        val connect = findViewById<Button>(R.id.btn_connect)
+        connect.setOnClickListener {
+            val etUrl = url.text.toString();
+            if (etUrl.isEmpty()) {
+                Toast.makeText(this@MainActivity,"Empty Link", Toast.LENGTH_LONG).show()
             } else {
-                val link = editLinkView.text.toString()
-                replyIntent.putExtra(EXTRA_REPLY, link)
-                setResult(Activity.RESULT_OK, replyIntent)
+                Toast.makeText(this@MainActivity, etUrl, Toast.LENGTH_LONG).show()
+                val intent = Intent(this, SimulatorActivity::class.java)
             }
-            finish()
         }
-    }
-
-    companion object {
-        const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == newLinkActivityRequestCode && resultCode == Activity.RESULT_OK) {
-            data?.getStringExtra(NewLinkActivity.EXTRA_REPLY)?.let {
+            data?.getStringExtra(SimulatorActivity.EXTRA_REPLY)?.let {
                 val link = Link(
                     System.currentTimeMillis(),
                     it
@@ -58,5 +61,9 @@ class MainActivity : AppCompatActivity() {
                 R.string.empty_not_saved,
                 Toast.LENGTH_LONG).show()
         }
+    }
+
+    companion object {
+        const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
 }
