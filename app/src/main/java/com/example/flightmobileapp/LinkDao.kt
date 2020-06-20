@@ -9,7 +9,7 @@ import androidx.room.Query
 @Dao
 interface LinkDao {
     @Query("SELECT * from linkTable ORDER BY time DESC LIMIT 5")
-    fun getRecentLinks(): LiveData<List<Link>>
+    fun getRecentLinks(): List<Link>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(link: Link)
