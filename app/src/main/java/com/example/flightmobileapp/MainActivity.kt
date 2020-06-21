@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -16,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     private val newLinkActivityRequestCode = 1
     private lateinit var linkViewModel: LinkViewModel
     private lateinit var url: EditText
+    private var client = ClientConnect()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -23,22 +27,23 @@ class MainActivity : AppCompatActivity() {
         val adapter = LinkListAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+
         //linkViewModel = ViewModelProvider(this).get(linkViewModel::class.java)
         /*linkViewModel.allLinks.observe(this, Observer { links ->
             // Update the cached copy of the words in the adapter.
             links?.let { adapter.setWords(it) }
         })*/
-        url = findViewById<EditText>(R.id.url)
+
+
+        // !!!! Anonymous function too long, I changed a bit and separated to connectToServer
+        //          Listens through onclick xml  !!!!
+
         val connect = findViewById<Button>(R.id.btn_connect)
         connect.setOnClickListener {
-            val etUrl = url.text.toString();
-            if (etUrl.isEmpty()) {
-                Toast.makeText(this@MainActivity,"Empty Link", Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(this@MainActivity, etUrl, Toast.LENGTH_LONG).show()
-                val intent = Intent(this, SimulatorActivity::class.java)
-            }
+            connectToServer(it)
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -59,6 +64,39 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG).show()
         }
     }
+
+
+    // On Click connect button, connecting to url that selected
+    private fun connectToServer(view: View) {
+        // Try to connect to server
+        url = findViewById<EditText>(R.id.url)
+        val myUrlString = url.text.toString()
+        if (myUrlString.isEmpty()) {
+            val duration = Toast.LENGTH_LONG
+            val toast = Toast.makeText(this@MainActivity, "Empty Link", duration)
+            toast.setGravity(Gravity.CENTER, 0, 0)
+            toast.show()
+            return
+        }
+            val connected = client.connect(myUrlString)
+            if (!connected) {
+                // Failed to connect to server
+                val text = "Ops - Login failed, please try again!"
+                val duration = Toast.LENGTH_LONG
+                val toast = Toast.makeText(this@MainActivity, text, duration)
+                toast.setGravity(Gravity.CENTER, 0, 0)
+                toast.show()
+                url.setText("")
+            } else {
+                // Succeeded connecting to server
+                val intent = Intent(this, SimulatorActivity::class.java).apply {
+                    putExtra("url", myUrlString)
+
+                }
+                startActivity(intent)
+            }
+
+        }
 
     companion object {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"

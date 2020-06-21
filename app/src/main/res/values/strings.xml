@@ -5,4 +5,5 @@
     <string name="empty_not_saved">Empty Link</string>
     <string name="fragment_login_label">Label</string>
     <string name="fragment_simulator_label">Label</string>
+    <string name="todo">TODO</string>
 </resources>
