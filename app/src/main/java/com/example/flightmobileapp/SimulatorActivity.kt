@@ -1,62 +1,35 @@
 package com.example.flightmobileapp
 
-import android.content.Intent
-import android.graphics.BitmapFactory
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
-import androidx.activity.OnBackPressedCallback
-import com.google.gson.GsonBuilder
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import androidx.appcompat.app.AppCompatActivity
+
 
 class SimulatorActivity : AppCompatActivity() {
-    private var client = ClientConnect()
+    private var loopGetImage = false
     lateinit var image : ImageView
+    private var client = ClientConnect(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        // Get url that select in login screen
         val url = intent.getStringExtra("url")
-        val connected = client.connect(url)
+
+        val connected = client.connect(url!!)
         if (connected) {
             setContentView(R.layout.activity_simulator)
-            image = findViewById(R.id.screen_shoot)
-            startShowScreenShoots(url)
+            image = findViewById(R.id.image1)
+            loopGetImage = true
+            startShowScreenShoots()
         }
     }
 
-    private fun startShowScreenShoots(url : String) {
+    private fun startShowScreenShoots() {
         Thread {
-            val gson = GsonBuilder()
-                .setLenient()
-                .create()
-            val retrofit = Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
-            val myApi = retrofit.create(ApiConnectServer::class.java)
-            while(true) {
-                val body = myApi.getScreenShoot().enqueue(object : Callback<ResponseBody> {
-                    override fun onResponse(
-                        call: Call<ResponseBody>,
-                        response: Response<ResponseBody>
-                    ) {
-                        val I = response.body()?.byteStream()
-                        val B = BitmapFactory.decodeStream(I)
-                        runOnUiThread {
-                            image.setImageBitmap(B)
-                        }
-                    }
-                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        var i: Int = 5
-                    }
-                })
-                Thread.sleep(5000)
+            while(loopGetImage) {
+                client.getImage(image)
+                Thread.sleep(500)
             }
         }.start()
     }

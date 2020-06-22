@@ -13,12 +13,16 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private val newLinkActivityRequestCode = 1
     private lateinit var linkViewModel: LinkViewModel
     private lateinit var url: EditText
-    private var client = ClientConnect()
+    private var client = ClientConnect(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,36 +72,50 @@ class MainActivity : AppCompatActivity() {
 
     // On Click connect button, connecting to url that selected
     private fun connectToServer(view: View) {
-        // Try to connect to server
+
+        // url that selected
         url = findViewById<EditText>(R.id.url)
         val myUrlString = url.text.toString()
+
+        // if url empty
         if (myUrlString.isEmpty()) {
-            val duration = Toast.LENGTH_LONG
-            val toast = Toast.makeText(this@MainActivity, "Empty Link", duration)
-            toast.setGravity(Gravity.CENTER, 0, 0)
-            toast.show()
+            client.showError("Ops - Empty Url, Please try again!")
             return
         }
-            val connected = client.connect(myUrlString)
-            if (!connected) {
-                // Failed to connect to server
-                val text = "Ops - Login failed, please try again!"
-                val duration = Toast.LENGTH_LONG
-                val toast = Toast.makeText(this@MainActivity, text, duration)
-                toast.setGravity(Gravity.CENTER, 0, 0)
-                toast.show()
-                url.setText("")
-            } else {
-                // Succeeded connecting to server
-                val intent = Intent(this, SimulatorActivity::class.java).apply {
-                    putExtra("url", myUrlString)
 
+        // Try to connect
+        val connected = client.connect(myUrlString)
+        if (!connected) {
+            // Failed to connect to server
+            client.showError("Ops - Login Failed, Please try again!")
+            url.setText("")
+
+        } else {
+            // Succeeded connecting to server
+            client.createAPI()
+            client.getAPI().getScreenShoot().enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
+                    if (response.code() == 404) {
+                        client.showError("Can't connect to server Err 404, try again!")
+                        url.setText("")
+                        return
+                    }
+                    // succeeded connecting to server:
+                    val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
+                    intent.putExtra("url", myUrlString)
+                    startActivity(intent)
                 }
-                startActivity(intent)
-            }
-
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    client.showError("Can't connect to server (onFailure), try again!")
+                    url.setText("")
+                    return
+                }
+            })
         }
-
+    }
     companion object {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
