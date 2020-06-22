@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         val connect = findViewById<Button>(R.id.btn_connect)
         connect.setOnClickListener {
-            connectToServer(it)
+            connectToServer()
         }
 
     }
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
 
 
     // On Click connect button, connecting to url that selected
-    private fun connectToServer(view: View) {
+    private fun connectToServer() {
 
         // url that selected
         url = findViewById<EditText>(R.id.url)
@@ -110,7 +110,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     client.showError("Can't connect to server (onFailure), try again!")
-                    url.setText("")
                     return
                 }
             })

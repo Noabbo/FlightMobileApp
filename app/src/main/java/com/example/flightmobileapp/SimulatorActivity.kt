@@ -3,6 +3,10 @@ package com.example.flightmobileapp
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class SimulatorActivity : AppCompatActivity() {
@@ -19,30 +23,37 @@ class SimulatorActivity : AppCompatActivity() {
         val connected = client.connect(url!!)
         if (connected) {
             setContentView(R.layout.activity_simulator)
-            image = findViewById(R.id.image1)
+            image = findViewById(R.id.screen_shot)
             loopGetImage = true
             startShowScreenShoots()
         }
     }
 
     private fun startShowScreenShoots() {
-        Thread {
-            while(loopGetImage) {
+        CoroutineScope(IO).launch {
+            while (loopGetImage) {
                 client.getImage(image)
-                Thread.sleep(500)
+                delay(500)
             }
-        }.start()
+        }
     }
-
-
 
     companion object {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
-    /*override fun OnBackPressed() {
-        // Disconnect from server.
-        // Go back to login screen.
-        val intent = Intent(this, MainActivity::class.java)
-        super.onBackPressed();
-    }*/
+
+    override fun onStart() {
+        super.onStart()
+        loopGetImage = true
+        startShowScreenShoots()
+    }
+
+    override fun onDestroy() {
+        loopGetImage = false
+        super.onDestroy()
+    }
+    override fun onPause(){
+        loopGetImage = false
+        super.onPause()
+    }
 }

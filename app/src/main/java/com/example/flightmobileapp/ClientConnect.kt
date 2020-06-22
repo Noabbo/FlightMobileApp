@@ -24,7 +24,10 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
     private lateinit var myConnection: HttpURLConnection
     private lateinit var api: ApiConnectServer
 
-    //http://localhost:5000/
+    fun getAPI(): ApiConnectServer {
+        return api
+    }
+
     fun connect(url: String):Boolean {
         val tempUrl: URL
         try {
@@ -38,7 +41,6 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         createAPI()
         return true
     }
-
 
 
     fun createAPI() {
@@ -55,34 +57,32 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
 
 
     fun getImage(image : ImageView) {
-        val body = api.getScreenShoot().enqueue(object : Callback<ResponseBody> {
+        api.getScreenShoot().enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.code() != 200) {
-                    showError("Can't get image from server")
+                if (response.code() >= 300) {
+                    showError("Can't get image from server " + response.code().toString())
                     return
                 }
-                val I = response.body()?.byteStream()
-                val B = BitmapFactory.decodeStream(I)
+                val myInputStream = response.body()?.byteStream()
+                val myBitMap = BitmapFactory.decodeStream(myInputStream)
                 runOnUiThread {
-                    image.setImageBitmap(B)
+                    image.setImageBitmap(myBitMap)
                 }
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                showError("Can't get image from server")
+               //showError("Can't get image from server")
             }
         })
     }
 
     fun showError(msg: String) {
-        val duration = Toast.LENGTH_LONG
+        val duration = Toast.LENGTH_SHORT
         val toast = Toast.makeText(context, msg, duration)
         toast.setGravity(Gravity.CENTER, 0, 0)
         toast.show()
     }
 
-    fun getAPI(): ApiConnectServer {
-        return api
-    }
+
 
 
 }
