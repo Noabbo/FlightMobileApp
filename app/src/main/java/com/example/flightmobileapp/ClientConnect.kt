@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.GsonBuilder
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,11 +26,31 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
     private lateinit var myConnection: HttpURLConnection
     private lateinit var api: ApiConnectServer
 
+    // All Joystick parameters setters
+    private var aileron: Double = 0.0
+        set(value) {
+            field = value
+        }
+    private var elevator: Double = 0.0
+        set(value) {
+            field = value
+        }
+    private var throttle: Double = 0.0
+        set(value) {
+            field = value
+        }
+    private var rudder: Double = 0.0
+        set(value) {
+            field = value
+        }
+
+
+
     fun getAPI(): ApiConnectServer {
         return api
     }
 
-    fun connect(url: String):Boolean {
+    fun isValidHttp(url: String):Boolean {
         val tempUrl: URL
         try {
             tempUrl = URL(url)
@@ -55,14 +77,16 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         api = retrofit.create(ApiConnectServer::class.java)
     }
 
-
+    // Get a image from server
     fun getImage(image : ImageView) {
         api.getScreenShoot().enqueue(object : Callback<ResponseBody> {
+            // Get response - When a image show it
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.code() >= 300) {
+                if (response.code() >= 400) {
                     showError("Can't get image from server " + response.code().toString())
                     return
                 }
+                // Create a bit from stream and show the image
                 val myInputStream = response.body()?.byteStream()
                 val myBitMap = BitmapFactory.decodeStream(myInputStream)
                 runOnUiThread {
@@ -82,8 +106,35 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         toast.show()
     }
 
+    // Send a post command
+    fun sendCommand() {
+        // Create HttpURLConnection for post json
+        myConnection.requestMethod = "POST"
+        myConnection.setRequestProperty("Content-Type", "application/json; utf-8")
+        myConnection.setRequestProperty("Accept", "application/json")
+        myConnection.doOutput = true;
 
-
+        // create json and send it to server
+        val json: String =
+            "{\"aileron\":$aileron,\n\"rudder\":$rudder,\n\"elevator\":$elevator,\n\"throttle\":$throttle\n}"
+        val rb: RequestBody = RequestBody.create(MediaType.parse("application/json"), json)
+        api.postCommand(rb).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                try {
+                    if (response.code()>300) {
+                        showError("POST command is failed ")
+                    }
+                } catch (e: java.lang.Exception) {
+                    showError("POST command is failed")
+                }
+                return
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                showError("POST command is failed (onFailure)")
+                return
+            }
+        })
+    }
 
 }
 

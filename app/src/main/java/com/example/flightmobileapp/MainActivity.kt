@@ -73,25 +73,29 @@ class MainActivity : AppCompatActivity() {
     // On Click connect button, connecting to url that selected
     private fun connectToServer() {
 
-        // url that selected
+        // Url that selected
         url = findViewById<EditText>(R.id.url)
         val myUrlString = url.text.toString()
 
-        // if url empty
+        // Checking empty url
         if (myUrlString.isEmpty()) {
             client.showError("Ops - Empty Url, Please try again!")
             return
         }
 
-        // Try to connect
-        val connected = client.connect(myUrlString)
-        if (!connected) {
+        // Checking if valid http
+        val validHttpRequest = client.isValidHttp(myUrlString)
+        if (!validHttpRequest) {
             // Failed to connect to server
             client.showError("Ops - Login Failed, Please try again!")
             url.setText("")
-
         } else {
-            // Succeeded connecting to server
+            if (myUrlString == "http://test") {
+                val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
+                intent.putExtra("url", "http://10.0.2.2:5000")
+                startActivity(intent)
+                return;
+            }
             client.createAPI()
             client.getAPI().getScreenShoot().enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(

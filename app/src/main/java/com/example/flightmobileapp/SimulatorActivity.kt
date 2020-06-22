@@ -20,7 +20,7 @@ class SimulatorActivity : AppCompatActivity() {
         // Get url that select in login screen
         val url = intent.getStringExtra("url")
 
-        val connected = client.connect(url!!)
+        val connected = client.isValidHttp(url!!)
         if (connected) {
             setContentView(R.layout.activity_simulator)
             image = findViewById(R.id.screen_shot)
@@ -33,7 +33,7 @@ class SimulatorActivity : AppCompatActivity() {
         CoroutineScope(IO).launch {
             while (loopGetImage) {
                 client.getImage(image)
-                delay(500)
+                delay(350)
             }
         }
     }
@@ -42,6 +42,7 @@ class SimulatorActivity : AppCompatActivity() {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
 
+    /*
     override fun onStart() {
         super.onStart()
         loopGetImage = true
@@ -56,4 +57,11 @@ class SimulatorActivity : AppCompatActivity() {
         loopGetImage = false
         super.onPause()
     }
+     */
+
+
+
+
+
+
 }
