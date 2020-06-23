@@ -22,20 +22,23 @@ class SimulatorActivity : AppCompatActivity() {
         // Get url that select in login screen
         val url = intent.getStringExtra("url")
 
-        val connected = client.isValidHttp(url!!)
-        if (connected) {
+        val validUrl = client.isValidHttp(url!!)
+        if (validUrl) {
+            // Raises view of activity_simulator
             setContentView(R.layout.activity_simulator)
             image = findViewById(R.id.screen_shot)
             loopGetImage = true
             startShowScreenShoots()
         }
 
+        // only for test post need to delete todo
         val testSetControl = findViewById<Button>(R.id.test_button)
         testSetControl.setOnClickListener {
             senPostRandom()
         }
     }
 
+    // Start ask for image asyc
     private fun startShowScreenShoots() {
         CoroutineScope(IO).launch {
             while (loopGetImage) {
@@ -45,11 +48,8 @@ class SimulatorActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
-    }
 
-
+    // Test only need to delete todo
     private fun senPostRandom() {
 
         var aileron = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
@@ -87,6 +87,9 @@ class SimulatorActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    companion object {
+        const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
+    }
 
 
 }

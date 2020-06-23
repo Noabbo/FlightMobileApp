@@ -109,6 +109,8 @@
             app:layout_constraintStart_toEndOf="@+id/joystickView"
             app:layout_constraintTop_toTopOf="parent" />
 
+
+        //only test button need toi delete todo
         <Button
             android:id="@+id/test_button"
             android:layout_width="wrap_content"

@@ -18,9 +18,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.net.HttpURLConnection
 import java.net.URL
 
-
-// http://10.0.2.2:5000
-
 class ClientConnect(private var context: Context) : AppCompatActivity() {
     private lateinit var urlConnection: URL
     private lateinit var myConnection: HttpURLConnection
@@ -32,14 +29,18 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
     private var throttle: Double = 0.0
     private var rudder: Double = 0.0
 
-    fun setJoystickParameters(aileron1: Double, elevator1: Double, throttle1: Double, rudder1: Double ) {
-        this.aileron = aileron1
-        this.elevator = elevator1
-        this.throttle = throttle1
-        this.rudder = rudder1
+    // only for test need to delete todo
+    fun setJoystickParameters(aileron: Double, elevator: Double,
+                              throttle: Double, rudder: Double ) {
+        this.aileron = aileron
+        this.elevator = elevator
+        this.throttle = throttle
+        this.rudder = rudder
     }
 
-   fun setAileron(newAileron: Double) {
+    /** Setter of Joystick Parameters  **/
+
+    fun setAileron(newAileron: Double) {
        this.aileron = newAileron
    }
 
@@ -54,11 +55,12 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         this.rudder = newRudder
     }
 
-
+    // get api interface
     fun getAPI(): ApiConnectServer {
         return api
     }
 
+    // Checks that the url is valid
     fun isValidHttp(url: String):Boolean {
         val tempUrl: URL
         try {
@@ -69,12 +71,12 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
             return false
         }
         urlConnection = tempUrl
-        createAPI()
+        createApi()
         return true
     }
 
-
-    fun createAPI() {
+    // Envelopes the api interface, allows Jason, receive a url
+    fun createApi() {
         val gson = GsonBuilder()
             .setLenient()
             .create()
@@ -91,8 +93,8 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         api.getScreenShoot().enqueue(object : Callback<ResponseBody> {
             // Get response - When a image show it
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.code() >= 400) {
-                    showError("Can't get image from server " + response.code().toString())
+                if (response.code() >= 300) {
+                    showError("Can't get image from server ")
                     return
                 }
                 // Create a bit from stream and show the image
@@ -103,11 +105,10 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-               //showError("Can't get image from server")
             }
         })
     }
-
+    // Displays notes  for user, in the center of the screen for 2 seconds
     fun showError(msg: String) {
         val duration = Toast.LENGTH_SHORT
         val toast = Toast.makeText(context, msg, duration)
@@ -123,21 +124,20 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         myConnection.setRequestProperty("Accept", "application/json")
         myConnection.doOutput = true;
 
-        // create json and send it to server
+        // Create json and send it to server
         val json: String =
-            "{\"aileron\":$aileron,\n\"rudder\":$rudder,\n\"elevator\":$elevator,\n\"throttle\":$throttle\n}"
+            "{\"aileron\":$aileron,\n\"rudder" +
+                    "\":$rudder,\n\"elevator\":$elevator,\n\"throttle\":$throttle\n}"
         val rb: RequestBody = RequestBody.create(MediaType.parse("application/json"), json)
         api.postCommand(rb).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 try {
-                    if (response.code()>300) {
+                    if (response.code() >= 300) {
                         showError("POST command is failed ")
                     }
                 } catch (e: java.lang.Exception) {
                     showError("POST command is failed")
                 }
-                showError("POST - Succeeded,  code " + response.code().toString())
-
                 return
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {

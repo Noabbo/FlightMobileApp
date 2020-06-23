@@ -69,10 +69,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    //todo - short it to 30 line
     // On Click connect button, connecting to url that selected
     private fun connectToServer() {
-
         // Url that selected
         url = findViewById<EditText>(R.id.url)
         val myUrlString = url.text.toString()
@@ -98,8 +97,9 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 return;
             }
-            client.createAPI()
-            client.getAPI().getScreenShoot().enqueue(object : Callback<ResponseBody> {
+            client.createApi()
+            var myApi = client.getAPI()
+            myApi.getScreenShoot().enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,
                     response: Response<ResponseBody>
@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    client.showError("Can't connect to server (onFailure), try again!\n" + t.cause.toString())
+                    client.showError("Can't connect to server (onFailure), try again!\n")
                     return
                 }
             })
