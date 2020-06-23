@@ -76,9 +76,6 @@ dependencies {
     // virtual-joystick
     implementation 'io.github.controlwear:virtualjoystick:1.10.1'
 
-    // Room components
-    def room_version = "2.2.5"
-
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 

@@ -11,6 +11,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,20 +30,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: LinkListAdapter
     private lateinit var linkViewModel: LinkViewModel
     private lateinit var url: EditText
-    private var client = ClientConnect(this)   
-  
+    private var client = ClientConnect(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         val dao = LoginDatabase.getInstance(application).linkDao
         val repository = LinkRepository(dao)
         val factory = LinkViewModelFactory(repository)
-        linkViewModel = ViewModelProvider(this,factory).get(LinkViewModel::class.java)
+        linkViewModel = ViewModelProvider(this, factory).get(LinkViewModel::class.java)
         binding.myViewModel = linkViewModel
         binding.lifecycleOwner = this
         initRecyclerView()
 
-        linkViewModel.message.observe(this, Observer {it->
+        linkViewModel.message.observe(this, Observer { it ->
             it.getContentIfNotHandled()?.let {
                 Toast.makeText(
                     this,
@@ -58,31 +60,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initRecyclerView(){
+    //TODO Noa's Part!
+    private fun connectClick() {
+        val uri = findViewById<TextView>(R.id.link)
+        linkViewModel.saveAndConnect()
+        connectToServer()
+    }
+
+    private fun initRecyclerView() {
         binding.linkRecyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = LinkListAdapter { selectedItem:Link->listItemClicked(selectedItem)}
+        adapter = LinkListAdapter { selectedItem: Link -> listItemClicked(selectedItem) }
         binding.linkRecyclerView.adapter = adapter
         displaySubscribersList()
     }
 
-    private fun displaySubscribersList(){
+    private fun displaySubscribersList() {
         linkViewModel.links.observe(this, Observer {
             adapter.setList(it)
             adapter.notifyDataSetChanged()
         })
     }
 
-    private fun listItemClicked(link: Link){
+    private fun listItemClicked(link: Link) {
         linkViewModel.selectUrl(link)
     }
 
 
-  //TODO Shon's Part!
+    //TODO Shon's Part!
     //todo - short it to 30 line
     // On Click connect button, connecting to url that selected
     private fun connectToServer() {
         // Url that selected
-        url = findViewById<EditText>(R.id.url)
+        url = findViewById<EditText>(R.id.link)
         val myUrlString = url.text.toString()
 
         // Checking empty url
@@ -123,6 +132,7 @@ class MainActivity : AppCompatActivity() {
                     intent.putExtra("url", myUrlString)
                     startActivity(intent)
                 }
+
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     client.showError("Can't connect to server (onFailure), try again!\n")
                     return
@@ -130,17 +140,8 @@ class MainActivity : AppCompatActivity() {
             })
         }
     }
+
     companion object {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
-
-      //TODO Noa's Part!
-    private fun connectClick() {
-        val uri = findViewById<TextView>(R.id.link)
-        linkViewModel.saveAndConnect()
-        if (uri.text.isNotEmpty()) {
-            val i = Intent(this, SimulatorActivity::class.java)
-            connectToServer()
-            startActivity(i)
-        }
     }
 }
