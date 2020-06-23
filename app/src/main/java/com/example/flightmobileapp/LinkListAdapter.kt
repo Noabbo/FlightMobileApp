@@ -1,37 +1,43 @@
 package com.example.flightmobileapp
 
-import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.flightmobileapp.databinding.ListItemBinding
 
-class LinkListAdapter internal constructor(
-    context: Context
-) : RecyclerView.Adapter<LinkListAdapter.LinkViewHolder>() {
+class LinkListAdapter(private val clickListener:(Link)->Unit)
+    : RecyclerView.Adapter<MyViewHolder>()
+{
+    private val linksList = ArrayList<Link>()
 
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var links = emptyList<Link>() // Cached copy of words
-
-    inner class LinkViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val linkViewHolder: TextView = itemView.findViewById(R.id.textView)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding : ListItemBinding =
+            DataBindingUtil.inflate(layoutInflater,R.layout.list_item,parent,false)
+        return MyViewHolder(binding)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LinkViewHolder {
-        val itemView = inflater.inflate(R.layout.recyclerview_item, parent, false)
-        return LinkViewHolder(itemView)
+    override fun getItemCount(): Int {
+        return linksList.size
     }
 
-    override fun onBindViewHolder(holder: LinkViewHolder, position: Int) {
-        val current = links[position]
-        holder.linkViewHolder.text = current.link
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        holder.bind(linksList[position],clickListener)
     }
 
-    internal fun setWords(words: List<Link>) {
-        this.links = words
-        notifyDataSetChanged()
+    fun setList(links: List<Link>) {
+        linksList.clear()
+        linksList.addAll(links)
     }
+}
 
-    override fun getItemCount() = links.size
+class MyViewHolder (private val binding: ListItemBinding): RecyclerView.ViewHolder(binding.root){
+
+    fun bind(link: Link, clickListener:(Link)->Unit) {
+        binding.linkTextView.text = link.link
+        binding.listItemLayout.setOnClickListener{
+            clickListener(link)
+        }
+    }
 }

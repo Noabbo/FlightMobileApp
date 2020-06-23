@@ -1,31 +1,83 @@
 package com.example.flightmobileapp
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
+import android.app.usage.UsageEvents
+import android.content.Intent
+import android.icu.util.UniversalTimeScale.toLong
+import android.os.Build
+import android.provider.SyncStateContract.Helpers.insert
+import android.provider.SyncStateContract.Helpers.update
+import androidx.annotation.RequiresApi
+import androidx.databinding.Bindable
+import androidx.databinding.Observable
+import com.example.flightmobileapp.Event
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.reflect.Array.get
 
-class LinkViewModel (application: Application) : AndroidViewModel(application) {
+class LinkViewModel (private val repository: LinkRepository) : ViewModel(), Observable {
+    private val allLinks = repository.allLinks
+    val links = repository.listLinks
+    private var fromList = -1
 
-    private val repository: LinkRepository
-    // Using LiveData and caching what getAlphabetizedWords returns has several benefits:
-    // - We can put an observer on the data (instead of polling for changes) and only update the
-    //   the UI when the data actually changes.
-    // - Repository is completely separated from the UI through the ViewModel.
-    val allLinks: List<Link>
+    @Bindable
+    val etLink = MutableLiveData<String>()
+
+    @Bindable
+    val connectButtonText = MutableLiveData<String>()
+
+    private val statusMessage = MutableLiveData<Event<String>>()
+
+    val message: LiveData<Event<String>>
+        get() = statusMessage
 
     init {
-        val linksDao = LoginDatabase.getDatabase(application, viewModelScope).linkDao()
-        repository = LinkRepository(linksDao)
-        allLinks = repository.allLinks
+        connectButtonText.value = "Connect"
     }
 
-    /**
-     * Launching a new coroutine to insert the data in a non-blocking way
-     */
-    fun insert(link: Link) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insert(link)
+    fun saveAndConnect() {
+        if (etLink.value == null) {
+            statusMessage.value = Event("Please enter URL")
+        } else {
+            val l = etLink.value!!
+            // Check if link is valid!!
+            // Delete existing link to be placed again
+            if (fromList > -1) {
+                deleteLink(Link(fromList, l))
+            } else if (repository.isLinkInRoom(l)) {
+                deleteLink(repository.findLink(l))
+            }
+            // Insert link to database.
+            insertLink(Link(0, l))
+            fromList = -1
+            etLink.value = null
+        }
     }
+
+    fun selectUrl(link : Link) {
+        etLink.value = link.link
+        fromList = link.id
+    }
+
+    private fun insertLink(link: Link) = viewModelScope.launch {
+        val newRowId = repository.insert(link)
+        if (newRowId < 0) {
+            statusMessage.value = Event("Error Occurred")
+        }
+    }
+
+    private fun deleteLink(link: Link) = viewModelScope.launch {
+        val newRowId = repository.deleteLink(link)
+        if (newRowId < 0) {
+            statusMessage.value = Event("Error Occurred")
+        }
+    }
+
+    override fun removeOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {
+    }
+
+    override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {
+    }
+
 }

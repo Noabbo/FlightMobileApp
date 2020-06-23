@@ -14,7 +14,7 @@
             android:layout_gravity="center"
             android:clickable="true"
             android:focusable="true"
-            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardBackgroundColor="@android:color/holo_orange_light"
             app:cardCornerRadius="10dp"
             app:cardElevation="10dp" >
 
@@ -22,7 +22,9 @@
                 android:id="@+id/list_item_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:textAlignment="center"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/link_text_view"
