@@ -22,9 +22,6 @@ class SimulatorActivity : AppCompatActivity() {
         // Get url that select in login screen
         val url = intent.getStringExtra("url")
 
-
-
-
         val connected = client.isValidHttp(url!!)
         if (connected) {
             setContentView(R.layout.activity_simulator)
@@ -52,23 +49,6 @@ class SimulatorActivity : AppCompatActivity() {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
 
-    /*
-    override fun onStart() {
-        super.onStart()
-        loopGetImage = true
-        startShowScreenShoots()
-    }
-
-    override fun onDestroy() {
-        loopGetImage = false
-        super.onDestroy()
-    }
-    override fun onPause(){
-        loopGetImage = false
-        super.onPause()
-    }
-     */
-
 
     private fun senPostRandom() {
 
@@ -81,6 +61,31 @@ class SimulatorActivity : AppCompatActivity() {
         client.sendCommand();
     }
 
+
+
+    /** Stop asking for photos when the app is in the background or in destroy  **/
+    // Start when the app is active
+    override fun onStart() {
+        super.onStart()
+        loopGetImage = true
+        startShowScreenShoots()
+    }
+    override fun onResume(){
+        super.onResume()
+        this.loopGetImage=true;
+        startShowScreenShoots()
+    }
+
+    // Stop get image when the actively destroyed
+    override fun onDestroy() {
+        loopGetImage = false
+        super.onDestroy()
+    }
+    // Stop get image when the actively background
+    override fun onPause(){
+        loopGetImage = false
+        super.onPause()
+    }
 
 
 
