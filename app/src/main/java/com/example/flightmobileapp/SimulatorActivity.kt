@@ -62,7 +62,8 @@ class SimulatorActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 //There is no need to check if the margin is more then 1%
                 val realProgress = (progress - 50) / 50.0
-                //TODO send realProgress value to server
+                client.setRudder(realProgress)
+                client.sendCommand()
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
@@ -73,7 +74,8 @@ class SimulatorActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 //There is no need to check if the margin is more then 1%
                 val realProgress = progress / 100.0
-                //TODO send realProgress value to server
+                client.setThrottle(realProgress)
+                client.sendCommand()
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
@@ -86,11 +88,13 @@ class SimulatorActivity : AppCompatActivity() {
             var currAileron = 0.0
             var currElevator = 0.0
             override fun onMove(angle: Int, strength: Int) {
+                var changed = false
                 if (angle == 0 && strength == 0) {
                     this.currAileron = 0.0
                     this.currElevator = 0.0
-                    //TODO send currAileron to server
-                    //TODO send currElevator to server
+                    client.setAileron(0.0)
+                    client.setAileron(0.0)
+                    changed = true
                 } else {
                     val realStrength = strength / 100.0
                     val angleInRadians = angle * Math.PI / 180.0
@@ -101,12 +105,17 @@ class SimulatorActivity : AppCompatActivity() {
                     val elevatorDelta = currElevator - elevator
                     if (aileronDelta > 0.01 || aileronDelta < -0.01) {
                         currAileron = aileron
-                        //TODO send currAileron to server
+                        client.setAileron(currAileron)
+                        changed = true
                     }
                     if (elevatorDelta > 0.01 || elevatorDelta < -0.01) {
                         currElevator = elevator
-                        //TODO send currElevator to server
+                        client.setElevator(currElevator)
+                        changed = true
                     }
+                }
+                if (changed) {
+                    client.sendCommand()
                 }
             }
         })
