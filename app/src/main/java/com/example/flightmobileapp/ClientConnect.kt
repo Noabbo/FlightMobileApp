@@ -28,22 +28,31 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
 
     // All Joystick parameters setters
     private var aileron: Double = 0.0
-        set(value) {
-            field = value
-        }
     private var elevator: Double = 0.0
-        set(value) {
-            field = value
-        }
     private var throttle: Double = 0.0
-        set(value) {
-            field = value
-        }
     private var rudder: Double = 0.0
-        set(value) {
-            field = value
-        }
 
+    fun setJoystickParameters(aileron1: Double, elevator1: Double, throttle1: Double, rudder1: Double ) {
+        this.aileron = aileron1
+        this.elevator = elevator1
+        this.throttle = throttle1
+        this.rudder = rudder1
+    }
+
+   fun setAileron(newAileron: Double) {
+       this.aileron = newAileron
+   }
+
+    fun setElevator(newElevator: Double) {
+        this.elevator = newElevator
+    }
+
+    fun setThrottle(newThrottle: Double) {
+        this.throttle = newThrottle
+    }
+    fun setRudder(newRudder: Double) {
+        this.rudder = newRudder
+    }
 
 
     fun getAPI(): ApiConnectServer {
@@ -127,6 +136,8 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
                 } catch (e: java.lang.Exception) {
                     showError("POST command is failed")
                 }
+                showError("POST - Succeeded,  code " + response.code().toString())
+
                 return
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {

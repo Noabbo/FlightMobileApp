@@ -1,12 +1,14 @@
 package com.example.flightmobileapp
 
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.ThreadLocalRandom
 
 
 class SimulatorActivity : AppCompatActivity() {
@@ -20,6 +22,9 @@ class SimulatorActivity : AppCompatActivity() {
         // Get url that select in login screen
         val url = intent.getStringExtra("url")
 
+
+
+
         val connected = client.isValidHttp(url!!)
         if (connected) {
             setContentView(R.layout.activity_simulator)
@@ -27,13 +32,18 @@ class SimulatorActivity : AppCompatActivity() {
             loopGetImage = true
             startShowScreenShoots()
         }
+
+        val testSetControl = findViewById<Button>(R.id.test_button)
+        testSetControl.setOnClickListener {
+            senPostRandom()
+        }
     }
 
     private fun startShowScreenShoots() {
         CoroutineScope(IO).launch {
             while (loopGetImage) {
                 client.getImage(image)
-                delay(350)
+                delay(500)
             }
         }
     }
@@ -60,6 +70,16 @@ class SimulatorActivity : AppCompatActivity() {
      */
 
 
+    private fun senPostRandom() {
+
+        var aileron = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+        var elevator  = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+        var throttle = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+        var rudder = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+
+        client.setJoystickParameters(aileron,elevator,throttle,rudder);
+        client.sendCommand();
+    }
 
 
 

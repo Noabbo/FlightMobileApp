@@ -90,9 +90,11 @@ class MainActivity : AppCompatActivity() {
             client.showError("Ops - Login Failed, Please try again!")
             url.setText("")
         } else {
+
+            // For test only - need to delete (todo)
             if (myUrlString == "http://test") {
                 val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
-                intent.putExtra("url", "http://10.0.2.2:5000")
+                intent.putExtra("url", "http://10.0.2.2:5401")
                 startActivity(intent)
                 return;
             }
@@ -113,7 +115,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    client.showError("Can't connect to server (onFailure), try again!")
+                    client.showError("Can't connect to server (onFailure), try again!\n" + t.cause.toString())
                     return
                 }
             })
