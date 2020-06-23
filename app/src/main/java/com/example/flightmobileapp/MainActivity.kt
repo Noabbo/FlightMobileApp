@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         val button = findViewById<Button>(R.id.btn_connect)
         // set on-click listener
         button.setOnClickListener {
-            connectClick()
+            this.connectClick()
         }
     }
 

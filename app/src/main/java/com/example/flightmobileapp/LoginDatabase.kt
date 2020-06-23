@@ -19,10 +19,10 @@ abstract class LoginDatabase : RoomDatabase() {
         fun getInstance(context: Context): LoginDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
-            synchronized(this){
+            synchronized(this) {
                 var instance = INSTANCE
-                if(instance==null){
-                    instance = Room.databaseBuilder(
+                if(instance==null) {
+                    instance = Room.databaseBuilder (
                         context.applicationContext,
                         LoginDatabase::class.java,
                         "loginDatabase"
