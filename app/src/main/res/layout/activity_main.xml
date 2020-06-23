@@ -1,44 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#444444"
-    tools:context=".MainActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="myViewModel"
+            type="com.example.flightmobileapp.LinkViewModel" />
+    </data>
     <LinearLayout
-        android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#444444"
         android:gravity="center"
+        android:orientation="vertical"
         android:padding="25dp"
-        android:orientation="vertical">
+        tools:context=".MainActivity">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            tools:listitem="@layout/recyclerview_item"
-            android:padding="@dimen/big_padding"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/link_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_orange_dark"
+            android:padding="@dimen/big_padding" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/url"
+                android:id="@+id/link"
                 android:layout_width="255dp"
                 android:layout_height="wrap_content"
                 android:autofillHints=""
                 android:hint="@string/enter_url"
                 android:importantForAutofill="no"
-                android:inputType="textUri"
+                android:inputType="text"
+                android:text="@={myViewModel.etLink}"
                 android:textAlignment="center"
                 android:textColor="#6bfff7"
                 android:textColorHint="#52afaa" />
@@ -47,11 +46,10 @@
                 android:id="@+id/btn_connect"
                 android:layout_width="101dp"
                 android:layout_height="wrap_content"
-                android:text="@string/connect"
+                android:text="@={myViewModel.connectButtonText}"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textColor="@color/colorPrimaryDark"/>
+                android:textColor="@color/colorPrimaryDark" />
         </LinearLayout>
-
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
