@@ -24,7 +24,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.ThreadLocalRandom
 
-
 class SimulatorActivity : AppCompatActivity() {
     private var loopGetImage = false
     lateinit var image : ImageView
@@ -153,6 +152,7 @@ class SimulatorActivity : AppCompatActivity() {
         loopGetImage = true
         startShowScreenShoots()
     }
+  
     override fun onResume(){
         super.onResume()
         this.loopGetImage=true;
@@ -173,6 +173,4 @@ class SimulatorActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
-
-
 }
