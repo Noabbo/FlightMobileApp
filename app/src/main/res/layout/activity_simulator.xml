@@ -26,8 +26,8 @@
         android:layout_weight=".4">
         <io.github.controlwear.virtual.joystick.android.JoystickView
             android:id="@+id/joystickView"
-            android:layout_width="398dp"
-            android:layout_height="250dp"
+            android:layout_width="230dp"
+            android:layout_height="230dp"
             android:background="@drawable/knob_base"
             app:JV_borderWidth="4dp"
             app:JV_buttonImage="@drawable/knob"
@@ -42,8 +42,9 @@
             android:id="@+id/textViewAileron"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="@string/aileron"
-            android:textSize="36sp"
+            android:textSize="30sp"
             app:layout_constraintBottom_toTopOf="@+id/joystickView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -51,8 +52,11 @@
 
         <SeekBar
             android:id="@+id/seekBarRudder"
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
             android:layout_width="250dp"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
+            android:progress="50"
+            android:thumb="@drawable/custom_thumb"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/joystickView" />
@@ -62,32 +66,50 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
+            android:layout_marginBottom="32dp"
             android:text="@string/rudder"
-            android:textSize="36sp"
+            android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/seekBarRudder" />
 
-        <SeekBar
-            android:id="@+id/seekBarThrottle"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/vertiaclSeekBar"
+            android:layout_width="35dp"
             android:layout_height="250dp"
-            android:rotation="90"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toStartOf="@+id/joystickView"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <SeekBar
+                android:id="@+id/seekBarThrottle"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:rotation="270"
+                android:thumb="@drawable/custom_thumb"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
         <TextView
             android:id="@+id/textViewThrottle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="22dp"
             android:rotation="90"
             android:text="@string/throttle"
-            android:textSize="36sp"
+            android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/seekBarThrottle"
+            app:layout_constraintEnd_toStartOf="@+id/vertiaclSeekBar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -95,9 +117,10 @@
             android:id="@+id/textViewElevator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/elevator"
-            android:textSize="36sp"
+            android:layout_marginEnd="8dp"
             android:rotation="90"
+            android:text="@string/elevator"
+            android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/joystickView"
