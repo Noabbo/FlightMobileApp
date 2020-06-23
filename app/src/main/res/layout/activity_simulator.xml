@@ -10,19 +10,25 @@
     tools:context=".SimulatorActivity">
 
 
-        <ImageView
-            android:id="@+id/screen_shoot"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight=".6"
-            android:contentDescription="@string/todo"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="10dp"
-            tools:srcCompat="@tools:sample/avatars" />
+    <ImageView
+        android:id="@+id/screen_shot"
+        android:layout_width="match_parent"
+        android:layout_height="269dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.69"
+        tools:srcCompat="@tools:sample/avatars" />
+
+
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_weight=".4">
         <io.github.controlwear.virtual.joystick.android.JoystickView
             android:id="@+id/joystickView"
@@ -124,6 +130,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/joystickView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        //only test button need toi delete todo
+        <Button
+            android:id="@+id/test_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="post test"
+            app:layout_constraintBottom_toTopOf="@+id/seekBarThrottle"
+            app:layout_constraintEnd_toStartOf="@+id/textViewAileron"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

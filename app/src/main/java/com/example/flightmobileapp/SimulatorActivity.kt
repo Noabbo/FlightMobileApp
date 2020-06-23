@@ -1,9 +1,8 @@
 package com.example.flightmobileapp
 
-import android.content.Intent
-import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -19,20 +18,37 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.concurrent.ThreadLocalRandom
+
 
 class SimulatorActivity : AppCompatActivity() {
-    private var client = ClientConnect()
+    private var loopGetImage = false
     lateinit var image : ImageView
+    private var client = ClientConnect(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        // Get url that select in login screen
         val url = intent.getStringExtra("url")
-        val connected = client.connect(url)
-        if (connected) {
+
+        val validUrl = client.isValidHttp(url!!)
+        if (validUrl) {
+            // Raises view of activity_simulator
             setContentView(R.layout.activity_simulator)
-            image = findViewById(R.id.screen_shoot)
-            startShowScreenShoots(url)
+            image = findViewById(R.id.screen_shot)
+            loopGetImage = true
+            startShowScreenShoots()
+        }
+
+        // only for test post need to delete todo
+        val testSetControl = findViewById<Button>(R.id.test_button)
+        testSetControl.setOnClickListener {
+            senPostRandom()
         }
 
         setSeekBars()
@@ -96,46 +112,58 @@ class SimulatorActivity : AppCompatActivity() {
         })
     }
 
-    private fun startShowScreenShoots(url : String) {
-        Thread {
-            val gson = GsonBuilder()
-                .setLenient()
-                .create()
-            val retrofit = Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
-            val myApi = retrofit.create(ApiConnectServer::class.java)
-            while(true) {
-                val body = myApi.getScreenShoot().enqueue(object : Callback<ResponseBody> {
-                    override fun onResponse(
-                        call: Call<ResponseBody>,
-                        response: Response<ResponseBody>
-                    ) {
-                        val I = response.body()?.byteStream()
-                        val B = BitmapFactory.decodeStream(I)
-                        runOnUiThread {
-                            image.setImageBitmap(B)
-                        }
-                    }
-                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        var i: Int = 5
-                    }
-                })
-                Thread.sleep(5000)
+    // Start ask for image asyc
+    private fun startShowScreenShoots() {
+        CoroutineScope(IO).launch {
+            while (loopGetImage) {
+                client.getImage(image)
+                delay(500)
             }
-        }.start()
+        }
     }
 
 
+    // Test only need to delete todo
+    private fun senPostRandom() {
+
+        var aileron = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+        var elevator  = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+        var throttle = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+        var rudder = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+
+        client.setJoystickParameters(aileron,elevator,throttle,rudder);
+        client.sendCommand();
+    }
+
+
+
+    /** Stop asking for photos when the app is in the background or in destroy  **/
+    // Start when the app is active
+    override fun onStart() {
+        super.onStart()
+        loopGetImage = true
+        startShowScreenShoots()
+    }
+    override fun onResume(){
+        super.onResume()
+        this.loopGetImage=true;
+        startShowScreenShoots()
+    }
+
+    // Stop get image when the actively destroyed
+    override fun onDestroy() {
+        loopGetImage = false
+        super.onDestroy()
+    }
+    // Stop get image when the actively background
+    override fun onPause(){
+        loopGetImage = false
+        super.onPause()
+    }
 
     companion object {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
-    /*override fun OnBackPressed() {
-        // Disconnect from server.
-        // Go back to login screen.
-        val intent = Intent(this, MainActivity::class.java)
-        super.onBackPressed();
-    }*/
+
+
 }

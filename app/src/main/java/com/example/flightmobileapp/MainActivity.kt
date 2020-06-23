@@ -13,12 +13,16 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private val newLinkActivityRequestCode = 1
     private lateinit var linkViewModel: LinkViewModel
     private lateinit var url: EditText
-    private var client = ClientConnect()
+    private var client = ClientConnect(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         val connect = findViewById<Button>(R.id.btn_connect)
         connect.setOnClickListener {
-            connectToServer(it)
+            connectToServer()
         }
 
     }
@@ -65,39 +69,58 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    //todo - short it to 30 line
     // On Click connect button, connecting to url that selected
-    private fun connectToServer(view: View) {
-        // Try to connect to server
+    private fun connectToServer() {
+        // Url that selected
         url = findViewById<EditText>(R.id.url)
         val myUrlString = url.text.toString()
+
+        // Checking empty url
         if (myUrlString.isEmpty()) {
-            val duration = Toast.LENGTH_LONG
-            val toast = Toast.makeText(this@MainActivity, "Empty Link", duration)
-            toast.setGravity(Gravity.CENTER, 0, 0)
-            toast.show()
+            client.showError("Ops - Empty Url, Please try again!")
             return
         }
-            val connected = client.connect(myUrlString)
-            if (!connected) {
-                // Failed to connect to server
-                val text = "Ops - Login failed, please try again!"
-                val duration = Toast.LENGTH_LONG
-                val toast = Toast.makeText(this@MainActivity, text, duration)
-                toast.setGravity(Gravity.CENTER, 0, 0)
-                toast.show()
-                url.setText("")
-            } else {
-                // Succeeded connecting to server
-                val intent = Intent(this, SimulatorActivity::class.java).apply {
-                    putExtra("url", myUrlString)
 
-                }
+        // Checking if valid http
+        val validHttpRequest = client.isValidHttp(myUrlString)
+        if (!validHttpRequest) {
+            // Failed to connect to server
+            client.showError("Ops - Login Failed, Please try again!")
+            url.setText("")
+        } else {
+
+            // For test only - need to delete (todo)
+            if (myUrlString == "http://test") {
+                val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
+                intent.putExtra("url", "http://10.0.2.2:5401")
                 startActivity(intent)
+                return;
             }
-
+            client.createApi()
+            var myApi = client.getAPI()
+            myApi.getScreenShoot().enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
+                    if (response.code() == 404) {
+                        client.showError("Can't connect to server Err 404, try again!")
+                        url.setText("")
+                        return
+                    }
+                    // succeeded connecting to server:
+                    val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
+                    intent.putExtra("url", myUrlString)
+                    startActivity(intent)
+                }
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    client.showError("Can't connect to server (onFailure), try again!\n")
+                    return
+                }
+            })
         }
-
+    }
     companion object {
         const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
