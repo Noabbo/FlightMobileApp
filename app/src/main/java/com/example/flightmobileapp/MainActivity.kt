@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    //TODO Shon's Part!
     //todo - short it to 30 line
     // On Click connect button, connecting to url that selected
     private fun connectToServer() {

@@ -43,13 +43,6 @@ class SimulatorActivity : AppCompatActivity() {
             loopGetImage = true
             startShowScreenShoots()
         }
-
-        // only for test post need to delete todo
-        val testSetControl = findViewById<Button>(R.id.test_button)
-        testSetControl.setOnClickListener {
-            senPostRandom()
-        }
-
         setSeekBars()
         setJoystick()
 
@@ -129,21 +122,6 @@ class SimulatorActivity : AppCompatActivity() {
             }
         }
     }
-
-
-    // Test only need to delete todo
-    private fun senPostRandom() {
-
-        var aileron = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
-        var elevator  = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
-        var throttle = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
-        var rudder = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
-
-        client.setJoystickParameters(aileron,elevator,throttle,rudder);
-        client.sendCommand();
-    }
-
-
 
     /** Stop asking for photos when the app is in the background or in destroy  **/
     // Start when the app is active

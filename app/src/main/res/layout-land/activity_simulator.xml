@@ -115,17 +115,6 @@
             app:layout_constraintStart_toEndOf="@+id/joystickView"
             app:layout_constraintTop_toTopOf="parent" />
 
-
-        //only test button need toi delete todo
-        <Button
-            android:id="@+id/test_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="post test"
-            app:layout_constraintBottom_toTopOf="@+id/seekBarThrottle"
-            app:layout_constraintEnd_toStartOf="@+id/textViewAileron"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView

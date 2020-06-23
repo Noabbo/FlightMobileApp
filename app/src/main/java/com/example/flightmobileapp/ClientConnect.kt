@@ -1,5 +1,4 @@
 package com.example.flightmobileapp
-
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.view.Gravity
@@ -22,6 +21,10 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
     private lateinit var urlConnection: URL
     private lateinit var myConnection: HttpURLConnection
     private lateinit var api: ApiConnectServer
+    private var toast: Toast? = null
+    private var errorGetInRow: Int = 0
+    private var errorServerInRow: Int = 0
+
 
     // All Joystick parameters setters
     private var aileron: Double = 0.0
@@ -29,20 +32,10 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
     private var throttle: Double = 0.0
     private var rudder: Double = 0.0
 
-    // only for test need to delete todo
-    fun setJoystickParameters(aileron: Double, elevator: Double,
-                              throttle: Double, rudder: Double ) {
-        this.aileron = aileron
-        this.elevator = elevator
-        this.throttle = throttle
-        this.rudder = rudder
-    }
-
     /** Setter of Joystick Parameters  **/
-
     fun setAileron(newAileron: Double) {
-       this.aileron = newAileron
-   }
+        this.aileron = newAileron
+    }
 
     fun setElevator(newElevator: Double) {
         this.elevator = newElevator
@@ -93,8 +86,14 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         api.getScreenShoot().enqueue(object : Callback<ResponseBody> {
             // Get response - When a image show it
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.code() >= 300) {
-                    showError("Can't get image from server ")
+                if (response.code() >= 300 && errorGetInRow > 10) {
+                    showError("Many errors were received from the image server-\n" +
+                            "Please return to the login screen")
+                    errorGetInRow++
+                    return
+                } else if (response.code() >= 300) {
+                    showError("Can't get image from server")
+                    errorGetInRow++
                     return
                 }
                 // Create a bit from stream and show the image
@@ -103,19 +102,25 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
                 runOnUiThread {
                     image.setImageBitmap(myBitMap)
                 }
+                errorGetInRow = 0
+                errorServerInRow =0
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 showError("Can't get image from server (onFailure)")
-
+                if (errorServerInRow > 10)
+                    showError("Connection with server is problematic- \n" +
+                            " please return to login screen")
+                errorServerInRow++
             }
         })
     }
+
     // Displays notes  for user, in the center of the screen for 2 seconds
     fun showError(msg: String) {
-        val duration = Toast.LENGTH_SHORT
-        val toast = Toast.makeText(context, msg, duration)
-        toast.setGravity(Gravity.CENTER, 0, 0)
-        toast.show()
+        toast?.cancel()
+        toast = Toast.makeText(context, msg, Toast.LENGTH_LONG)
+        toast?.setGravity(Gravity.CENTER, 0, 0)
+        toast?.show()
     }
 
     // Send a post command
@@ -131,25 +136,26 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
             "{\"aileron\":$aileron,\n\"rudder" +
                     "\":$rudder,\n\"elevator\":$elevator,\n\"throttle\":$throttle\n}"
         val rb: RequestBody = RequestBody.create(MediaType.parse("application/json"), json)
+
         api.postCommand(rb).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 try {
                     if (response.code() >= 300) {
-                        showError("POST command is failed Error 300+")
+                        showError("POST command is failed ")
                         return
                     }
                 } catch (e: java.lang.Exception) {
-                    showError("POST command is failed - Exception")
+                    showError("POST command is failed")
                     return
                 }
-                return
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                showError("POST command is failed (onFailure)")
+                showError("POST command failed (onFailure)")
                 return
             }
         })
     }
+
 
 }
 
