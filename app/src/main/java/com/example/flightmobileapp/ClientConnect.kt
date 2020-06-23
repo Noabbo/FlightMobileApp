@@ -94,7 +94,7 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
             // Get response - When a image show it
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.code() >= 300) {
-                   // showError("Can't get image from server ")
+                    showError("Can't get image from server ")
                     return
                 }
                 // Create a bit from stream and show the image
@@ -105,6 +105,8 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                showError("Can't get image from server (onFailure)")
+
             }
         })
     }
@@ -133,14 +135,13 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 try {
                     if (response.code() >= 300) {
-                        showError("POST command is failed ")
+                        showError("POST command is failed Error 300+")
                         return
                     }
                 } catch (e: java.lang.Exception) {
-                    showError("POST command is failed")
+                    showError("POST command is failed - Exception")
                     return
                 }
-                showError("Good POST "+ response.code())
                 return
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
