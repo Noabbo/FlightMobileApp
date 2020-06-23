@@ -60,10 +60,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //TODO Noa's Part!
     private fun connectClick() {
         val uri = findViewById<TextView>(R.id.link)
-        linkViewModel.saveAndConnect()
+        if (uri.text.isNotEmpty()) {
+            linkViewModel.saveAndConnect()
+        }
         connectToServer()
     }
 
@@ -86,7 +87,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    //TODO Shon's Part!
     //todo - short it to 30 line
     // On Click connect button, connecting to url that selected
     private fun connectToServer() {
@@ -113,10 +113,10 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
                 intent.putExtra("url", "http://10.0.2.2:5401")
                 startActivity(intent)
-                return;
+                return
             }
             client.createApi()
-            var myApi = client.getAPI()
+            val myApi = client.getAPI()
             myApi.getScreenShoot().enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,
