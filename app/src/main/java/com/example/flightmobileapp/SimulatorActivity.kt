@@ -30,6 +30,7 @@ class SimulatorActivity : AppCompatActivity() {
     private var client = ClientConnect(this)
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Get url that select in login screen
@@ -117,22 +118,26 @@ class SimulatorActivity : AppCompatActivity() {
     private fun startShowScreenShoots() {
         CoroutineScope(IO).launch {
             while (loopGetImage) {
-                client.getImage(image)
+                client.getImage(image, loopGetImage)
                 delay(500)
             }
         }
     }
 
+
+
     /** Stop asking for photos when the app is in the background or in destroy  **/
     // Start when the app is active
     override fun onStart() {
         super.onStart()
+        this.client.flagSimulatorActivity = true
         loopGetImage = true
         startShowScreenShoots()
     }
   
     override fun onResume(){
         super.onResume()
+        this.client.flagSimulatorActivity = true
         this.loopGetImage=true;
         startShowScreenShoots()
     }
@@ -140,11 +145,13 @@ class SimulatorActivity : AppCompatActivity() {
     // Stop get image when the actively destroyed
     override fun onDestroy() {
         loopGetImage = false
+        this.client.flagSimulatorActivity = false
         super.onDestroy()
     }
     // Stop get image when the actively background
     override fun onPause(){
         loopGetImage = false
+        this.client.flagSimulatorActivity = false
         super.onPause()
     }
 

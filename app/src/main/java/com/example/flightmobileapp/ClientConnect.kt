@@ -1,8 +1,12 @@
 package com.example.flightmobileapp
+import android.R
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.view.Gravity
+import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.GsonBuilder
@@ -17,6 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.net.HttpURLConnection
 import java.net.URL
 
+
 class ClientConnect(private var context: Context) : AppCompatActivity() {
     private lateinit var urlConnection: URL
     private lateinit var myConnection: HttpURLConnection
@@ -24,6 +29,8 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
     private var toast: Toast? = null
     private var errorGetInRow: Int = 0
     private var errorServerInRow: Int = 0
+    private var errorSetInRow: Int = 0
+    var flagSimulatorActivity: Boolean = true
 
 
     // All Joystick parameters setters
@@ -82,17 +89,20 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
     }
 
     // Get a image from server
-    fun getImage(image : ImageView) {
+    fun getImage(image : ImageView, isRunning: Boolean) {
         api.getScreenShoot().enqueue(object : Callback<ResponseBody> {
             // Get response - When a image show it
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.code() >= 300 && errorGetInRow > 10) {
+                if(!flagSimulatorActivity) {
+                    return
+                }
+                if (response.code() >= 300 && errorGetInRow > 20) {
                     showError("Many errors were received from the image server-\n" +
-                            "Please return to the login screen")
+                            "Please return to the login screen", 1)
                     errorGetInRow++
                     return
                 } else if (response.code() >= 300) {
-                    showError("Can't get image from server")
+                    showError("Can't get image from server", 0)
                     errorGetInRow++
                     return
                 }
@@ -106,20 +116,31 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
                 errorServerInRow =0
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                showError("Can't get image from server (onFailure)")
+                if(!flagSimulatorActivity) {
+                    return
+                }
+                showError("Can't get image from server (onFailure)", 0)
                 if (errorServerInRow > 10)
                     showError("Connection with server is problematic- \n" +
-                            " please return to login screen")
+                            " please return to login screen", 1)
                 errorServerInRow++
             }
         })
     }
 
     // Displays notes  for user, in the center of the screen for 2 seconds
-    fun showError(msg: String) {
-        toast?.cancel()
-        toast = Toast.makeText(context, msg, Toast.LENGTH_LONG)
+    fun showError(msg: String, status: Int) {
+        if (toast != null) {
+            toast?.cancel()
+        }
+        toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT)
         toast?.setGravity(Gravity.CENTER, 0, 0)
+
+        if (status ==1 ) {
+            val v =
+                toast?.getView()?.findViewById<View>(R.id.message) as TextView
+            v.setTextColor(Color.RED)
+        }
         toast?.show()
     }
 
@@ -139,18 +160,40 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
 
         api.postCommand(rb).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if(!flagSimulatorActivity) {
+                    return
+                }
+
                 try {
+                    if (response.code() == 200) {
+                        errorSetInRow = 0
+                        return
+                    }
+                    if (errorSetInRow > 30) {
+                        showError("Many errors were received from the post commend-\n" +
+                                "Please return to the login screen",1)
+                        print("num - " +errorSetInRow +"\n")
+                        return
+                    }
                     if (response.code() >= 300) {
-                        showError("POST command is failed ")
+                        showError("POST command is failed ", 0)
+                        print("num respo - " +errorSetInRow +"\n")
+                        errorSetInRow++
                         return
                     }
                 } catch (e: java.lang.Exception) {
-                    showError("POST command is failed")
+                    showError("POST command is failed", 0)
+                    print("num EX- " +errorSetInRow +"\n")
+                    errorSetInRow++
                     return
                 }
+                errorSetInRow = 0
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                showError("POST command failed (onFailure)")
+                if(!flagSimulatorActivity) {
+                    return
+                }
+                showError("POST command failed (onFailure)", 0)
                 return
             }
         })
