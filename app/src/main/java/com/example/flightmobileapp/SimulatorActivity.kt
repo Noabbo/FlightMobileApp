@@ -30,6 +30,7 @@ class SimulatorActivity : AppCompatActivity() {
     private var client = ClientConnect(this)
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Get url that select in login screen
@@ -43,13 +44,6 @@ class SimulatorActivity : AppCompatActivity() {
             loopGetImage = true
             startShowScreenShoots()
         }
-
-        // only for test post need to delete todo
-        val testSetControl = findViewById<Button>(R.id.test_button)
-        testSetControl.setOnClickListener {
-            senPostRandom()
-        }
-
         setSeekBars()
         setJoystick()
 
@@ -131,30 +125,19 @@ class SimulatorActivity : AppCompatActivity() {
     }
 
 
-    // Test only need to delete todo
-    private fun senPostRandom() {
-
-        var aileron = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
-        var elevator  = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
-        var throttle = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
-        var rudder = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
-
-        client.setJoystickParameters(aileron,elevator,throttle,rudder);
-        client.sendCommand();
-    }
-
-
 
     /** Stop asking for photos when the app is in the background or in destroy  **/
     // Start when the app is active
     override fun onStart() {
         super.onStart()
+        this.client.flagSimulatorActivity = true
         loopGetImage = true
         startShowScreenShoots()
     }
   
     override fun onResume(){
         super.onResume()
+        this.client.flagSimulatorActivity = true
         this.loopGetImage=true;
         startShowScreenShoots()
     }
@@ -162,11 +145,13 @@ class SimulatorActivity : AppCompatActivity() {
     // Stop get image when the actively destroyed
     override fun onDestroy() {
         loopGetImage = false
+        this.client.flagSimulatorActivity = false
         super.onDestroy()
     }
     // Stop get image when the actively background
     override fun onPause(){
         loopGetImage = false
+        this.client.flagSimulatorActivity = false
         super.onPause()
     }
 

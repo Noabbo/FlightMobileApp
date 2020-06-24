@@ -61,10 +61,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun connectClick() {
-        val uri = findViewById<TextView>(R.id.link)
-        if (uri.text.isNotEmpty()) {
-            linkViewModel.saveAndConnect()
-        }
+        linkViewModel.saveAndConnect()
         connectToServer()
     }
 
@@ -96,18 +93,16 @@ class MainActivity : AppCompatActivity() {
 
         // Checking empty url
         if (myUrlString.isEmpty()) {
-            client.showError("Ops - Empty Url, Please try again!")
+            client.showError("Ops - Empty Url, Please try again!",0)
             return
         }
-
         // Checking if valid http
         val validHttpRequest = client.isValidHttp(myUrlString)
         if (!validHttpRequest) {
             // Failed to connect to server
-            client.showError("Ops - Login Failed, Please try again!")
+            client.showError("Ops - Login Failed, Please try again!", 0)
             url.setText("")
         } else {
-
             // For test only - need to delete (todo)
             if (myUrlString == "http://test") {
                 val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
@@ -123,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                     response: Response<ResponseBody>
                 ) {
                     if (response.code() == 404) {
-                        client.showError("Can't connect to server Err 404, try again!")
+                        client.showError("Can't connect to server Error 404, try again!", 0)
                         url.setText("")
                         return
                     }
@@ -134,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    client.showError("Can't connect to server (onFailure), try again!\n")
+                    client.showError("Can't connect to server, try again!", 0)
                     return
                 }
             })
