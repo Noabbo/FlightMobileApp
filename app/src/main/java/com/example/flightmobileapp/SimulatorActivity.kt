@@ -118,7 +118,7 @@ class SimulatorActivity : AppCompatActivity() {
     private fun startShowScreenShoots() {
         CoroutineScope(IO).launch {
             while (loopGetImage) {
-                client.getImage(image, loopGetImage)
+                client.getImage(image)
                 delay(500)
             }
         }

@@ -89,7 +89,7 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
     }
 
     // Get a image from server
-    fun getImage(image : ImageView, isRunning: Boolean) {
+    fun getImage(image : ImageView) {
         api.getScreenShoot().enqueue(object : Callback<ResponseBody> {
             // Get response - When a image show it
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {

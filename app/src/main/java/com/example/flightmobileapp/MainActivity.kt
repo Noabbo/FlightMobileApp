@@ -60,12 +60,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //TODO Noa's Part!
     private fun connectClick() {
-        val uri = findViewById<TextView>(R.id.link)
         linkViewModel.saveAndConnect()
-
-
         connectToServer()
     }
 
