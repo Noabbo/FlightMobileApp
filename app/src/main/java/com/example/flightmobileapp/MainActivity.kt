@@ -103,8 +103,15 @@ class MainActivity : AppCompatActivity() {
             client.showError("Ops - Login Failed, Please try again!", 0)
             url.setText("")
         } else {
+            // For test only - need to delete (todo)
+            if (myUrlString == "http://test") {
+                val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
+                intent.putExtra("url", "http://10.0.2.2:5401")
+                startActivity(intent)
+                return
+            }
             client.createApi()
-            var myApi = client.getAPI()
+            val myApi = client.getAPI()
             myApi.getScreenShoot().enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,
