@@ -1,12 +1,9 @@
 <resources>
     <string name="app_name">FlightMobileApp</string>
-    <string name="connect">Connect</string>
     <string name="enter_url" translatable="false">Type URL...</string>
-    <string name="empty_not_saved">Empty Link</string>
     <string name="aileron">Aileron</string>
     <string name="rudder">Rudder</string>
     <string name="throttle">Throttle</string>
     <string name="elevator">Elevator</string>
-    <string name="todo">TODO</string>
-    <string name="api_key">YOUR API KEY HERE</string>
+    <string name="simulator_screenshot_description">A view of the simulator</string>
 </resources>

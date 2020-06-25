@@ -1,23 +1,11 @@
 package com.example.flightmobileapp
 
-import android.app.Application
-import android.app.usage.UsageEvents
-import android.content.Intent
-import android.icu.util.UniversalTimeScale.toLong
-import android.os.Build
-import android.provider.SyncStateContract.Helpers.insert
-import android.provider.SyncStateContract.Helpers.update
-import androidx.annotation.RequiresApi
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
-import com.example.flightmobileapp.Event
 import androidx.lifecycle.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.reflect.Array.get
 
 class LinkViewModel (private val repository: LinkRepository) : ViewModel(), Observable {
-    private val allLinks = repository.allLinks
     val links = repository.listLinks
     private var fromList = -1
 

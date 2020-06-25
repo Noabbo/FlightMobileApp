@@ -1,28 +1,19 @@
 package com.example.flightmobileapp
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
-import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import androidx.room.Room
 import com.example.flightmobileapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -88,7 +79,7 @@ class MainActivity : AppCompatActivity() {
     // On Click connect button, connecting to url that selected
     private fun connectToServer() {
         // Url that selected
-        url = findViewById<EditText>(R.id.link)
+        url = findViewById(R.id.link)
         val myUrlString = url.text.toString()
 
         // Checking empty url
@@ -103,13 +94,6 @@ class MainActivity : AppCompatActivity() {
             client.showError("Oops - Login Failed, Please try again!", 0)
             url.setText("")
         } else {
-            // For test only - need to delete (todo)
-            if (myUrlString == "http://test") {
-                val intent = Intent(this@MainActivity, SimulatorActivity::class.java)
-                intent.putExtra("url", "http://10.0.2.2:5401")
-                startActivity(intent)
-                return
-            }
             client.createApi()
             val myApi = client.getAPI()
             myApi.getScreenShoot().enqueue(object : Callback<ResponseBody> {
@@ -134,9 +118,5 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
-    }
-
-    companion object {
-        const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
 }

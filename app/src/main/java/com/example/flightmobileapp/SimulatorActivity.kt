@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class SimulatorActivity : AppCompatActivity() {
     private var loopGetImage = false
-    lateinit var image : ImageView
+    private lateinit var image : ImageView
     private var client = ClientConnect(this)
 
 
@@ -94,7 +94,7 @@ class SimulatorActivity : AppCompatActivity() {
         })
     }
 
-    // Start ask for image asyc
+    // Start ask for image async
     private fun startShowScreenShoots() {
         CoroutineScope(IO).launch {
             while (loopGetImage) {
@@ -133,9 +133,5 @@ class SimulatorActivity : AppCompatActivity() {
         loopGetImage = false
         this.client.flagSimulatorActivity = false
         super.onPause()
-    }
-
-    companion object {
-        const val EXTRA_REPLY = "com.example.android.linklistsql.REPLY"
     }
 }
