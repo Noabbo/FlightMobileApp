@@ -150,12 +150,17 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         myConnection.requestMethod = "POST"
         myConnection.setRequestProperty("Content-Type", "application/json; utf-8")
         myConnection.setRequestProperty("Accept", "application/json")
-        myConnection.doOutput = true;
+        myConnection.doOutput = true
+
+        val aileronStr = "%.6f".format(aileron)
+        val rudderStr = "%.6f".format(rudder)
+        val elevatorStr = "%.6f".format(elevator)
+        val throttleStr = "%.6f".format(throttle)
 
         // Create json and send it to server
         val json: String =
-            "{\"aileron\":$aileron,\n\"rudder" +
-                    "\":$rudder,\n\"elevator\":$elevator,\n\"throttle\":$throttle\n}"
+            "{\"aileron\":" + aileronStr + ",\n\"rudder" + "\":" + rudderStr +
+                    ",\n\"elevator\":" + elevatorStr + ",\n\"throttle\":" + throttleStr + "\n}"
         val rb: RequestBody = RequestBody.create(MediaType.parse("application/json"), json)
 
         api.postCommand(rb).enqueue(object : Callback<ResponseBody> {
