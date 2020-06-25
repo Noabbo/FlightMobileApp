@@ -1,5 +1,4 @@
 package com.example.flightmobileapp
-import android.R
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -138,7 +137,7 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
 
         if (status ==1 ) {
             val v =
-                toast?.getView()?.findViewById<View>(R.id.message) as TextView
+                toast?.view?.findViewById<View>(R.id.message) as TextView
             v.setTextColor(Color.RED)
         }
         toast?.show()
@@ -165,34 +164,7 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
 
         api.postCommand(rb).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if(!flagSimulatorActivity) {
-                    return
-                }
-
-                try {
-                    if (response.code() == 200) {
-                        errorSetInRow = 0
-                        return
-                    }
-                    if (errorSetInRow > 30) {
-                        showError("Many errors were received from the post commend-\n" +
-                                "Please return to the login screen",1)
-                        print("num - " +errorSetInRow +"\n")
-                        return
-                    }
-                    if (response.code() >= 300) {
-                        showError("POST command is failed ", 0)
-                        print("num respo - " +errorSetInRow +"\n")
-                        errorSetInRow++
-                        return
-                    }
-                } catch (e: java.lang.Exception) {
-                    showError("POST command is failed", 0)
-                    print("num EX- " +errorSetInRow +"\n")
-                    errorSetInRow++
-                    return
-                }
-                errorSetInRow = 0
+                validateResponse(response)
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 if(!flagSimulatorActivity) {
@@ -204,6 +176,36 @@ class ClientConnect(private var context: Context) : AppCompatActivity() {
         })
     }
 
+    fun validateResponse(response: Response<ResponseBody>) {
+        if(!flagSimulatorActivity) {
+            return
+        }
+
+        try {
+            if (response.code() == 200) {
+                errorSetInRow = 0
+                return
+            }
+            if (errorSetInRow > 30) {
+                showError("Many errors were received from the post commend\n" +
+                        "Please return to the login screen",1)
+                print("num - " +errorSetInRow +"\n")
+                return
+            }
+            if (response.code() >= 300) {
+                showError("POST command is failed ", 0)
+                print("num respo - " +errorSetInRow +"\n")
+                errorSetInRow++
+                return
+            }
+        } catch (e: java.lang.Exception) {
+            showError("POST command is failed", 0)
+            print("num EX- " +errorSetInRow +"\n")
+            errorSetInRow++
+            return
+        }
+        errorSetInRow = 0
+    }
 
 }
 

@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         val validHttpRequest = client.isValidHttp(myUrlString)
         if (!validHttpRequest) {
             // Failed to connect to server
-            client.showError("Ops - Login Failed, Please try again!", 0)
+            client.showError("Oops - Login Failed, Please try again!", 0)
             url.setText("")
         } else {
             // For test only - need to delete (todo)
